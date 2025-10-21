@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Daily Devotional</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="container">
+    <h1>
+      <img src="images/download.jpeg" alt="Sun" class="title-icon"> Daily Devotional
+    </h1>
+
+    <!-- Date Picker Jump -->
+    <div class="jump">
+      <label for="jumpDate">Go to date: </label>
+      <input type="date" id="jumpDate">
+      <button id="jumpBtn">Go</button>
+    </div>
+
+    <div class="nav">
+      <button id="prevBtn">⬅️ Previous</button>
+      <p id="date"></p>
+      <button id="nextBtn">Next ➡️</button>
+    </div>
+
+    <div id="devotional">
+      <h2 id="title"></h2>
+      <p id="scriptures" class="scriptures"></p>
+      <p id="message"></p>
+
+      <h3>🕊️ Daily Plan</h3>
+      <ul id="prayers"></ul>
+
+      <button id="completeBtn">✅ Mark as Complete</button>
+      <p id="status"></p>
+    </div>
+  </div>
+
+  <script src="script.js"></script>
+</body>
+</html>
+
+
+
+
