@@ -38,6 +38,19 @@ function getSimpleDevice() {
   return "Other";
 }
 
+// Normalize sheet date (handles YYYY-MM-DD or MM/DD/YYYY)
+function normalizeSheetDate(sheetDate) {
+  if (!sheetDate) return null;
+  // ISO format
+  if (/^\d{4}-\d{2}-\d{2}/.test(sheetDate)) return sheetDate.split("T")[0];
+  // MM/DD/YYYY
+  if (/^\d{1,2}\/\d{1,2}\/\d{4}/.test(sheetDate)) {
+    const [m, d, y] = sheetDate.split("/").map(Number);
+    return `${y}-${String(m).padStart(2,"0")}-${String(d).padStart(2,"0")}`;
+  }
+  return null;
+}
+
 // --- ANALYTICS ---
 function sendAnalytics(actionType) {
   const devotionalDate = formatDateYYYYMMDD(currentDate);
@@ -63,11 +76,8 @@ function loadDevotional(dateObj) {
     .then(rows => {
       if (!Array.isArray(rows)) throw new Error("Invalid sheet data");
 
-      // Compare YYYY-MM-DD strings directly
       const todayData = rows.find(r => {
-        if (!r.date) return false;
-        const [y, m, d] = r.date.split("-").map(Number);
-        const sheetDateStr = y + "-" + String(m).padStart(2, "0") + "-" + String(d).padStart(2, "0");
+        const sheetDateStr = normalizeSheetDate(r.date);
         return sheetDateStr === dateISO;
       });
 
@@ -141,7 +151,6 @@ function loadDevotional(dateObj) {
         }
       }
 
-      // Build checklist
       standardPlan.forEach((item, index) => {
         const li = document.createElement("li");
         if (item.minutes) {
@@ -194,8 +203,6 @@ jumpBtn.addEventListener("click", () => {
 
   loadDevotional(currentDate);
 });
-
-// Enter key support for mobile
 jumpDateInput.addEventListener("keydown", (e) => {
   if (e.key === "Enter") jumpBtn.click();
 });
