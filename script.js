@@ -2,7 +2,7 @@
 const SHEET_ID = "1dC6pjjA_fW_1ZzAQjGX04WSa1c7aryG8leR4U1aB76o"; // replace with your Sheet ID
 const SHEET_NAME = "Devotionals"; // exact tab name
 const SHEET_URL = `https://opensheet.vercel.app/${SHEET_ID}/${SHEET_NAME}`;
-const ANALYTICS_URL = "AKfycbw3oKElpBiZ3fMkY9EJL3wd6LpmsOO1bCvTUDCRbg8EZIm0loXs_oX5uaLj4Cz1sXUo"; // replace with your Apps Script URL
+const ANALYTICS_URL = "https://script.google.com/macros/s/AKfycbw3oKElpBiZ3fMkY9EJL3wd6LpmsOO1bCvTUDCRbg8EZIm0loXs_oX5uaLj4Cz1sXUo/exec"; // replace with your Apps Script URL
 
 // === ELEMENTS ===
 const dateEl = document.getElementById("date");
