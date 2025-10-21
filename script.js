@@ -123,7 +123,6 @@ function loadDevotional(dateObj) {
         progressFill.style.width = `${percent}%`;
         progressFill.style.backgroundColor = percent === 100 ? "#28a745" : "#2c6cb8";
 
-        // Animate ready message at 100%
         if (percent === 100 && !localStorage.getItem(dateISO)) {
           statusEl.textContent = "🎉 Ready to mark complete!";
           statusEl.classList.add("ready");
@@ -179,11 +178,13 @@ nextBtn.addEventListener("click", () => {
   loadDevotional(currentDate);
 });
 
-// --- Date Picker Jump ---
+// --- Date Picker Jump (mobile-friendly) ---
 jumpBtn.addEventListener("click", () => {
-  const selectedDate = jumpDateInput.value;
+  const selectedDate = jumpDateInput.value; // "YYYY-MM-DD"
   if (!selectedDate) return;
-  currentDate = new Date(selectedDate);
+
+  const [year, month, day] = selectedDate.split("-").map(Number);
+  currentDate = new Date(year, month - 1, day); // local date
   loadDevotional(currentDate);
 });
 
