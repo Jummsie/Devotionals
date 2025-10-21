@@ -178,14 +178,20 @@ nextBtn.addEventListener("click", () => {
   loadDevotional(currentDate);
 });
 
-// --- Date Picker Jump (mobile-friendly) ---
+// --- Date Picker Jump (mobile-safe) ---
 jumpBtn.addEventListener("click", () => {
   const selectedDate = jumpDateInput.value; // "YYYY-MM-DD"
   if (!selectedDate) return;
 
   const [year, month, day] = selectedDate.split("-").map(Number);
-  currentDate = new Date(year, month - 1, day); // local date
+  currentDate = new Date(year, month - 1, day);
+  if (isNaN(currentDate)) return;
   loadDevotional(currentDate);
+});
+
+// --- Enter key support ---
+jumpDateInput.addEventListener("keydown", (e) => {
+  if (e.key === "Enter") jumpBtn.click();
 });
 
 // --- Complete Button ---
