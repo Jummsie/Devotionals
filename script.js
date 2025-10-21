@@ -1,8 +1,8 @@
 // === CONFIGURATION ===
-const SHEET_ID = "YOUR_SHEET_ID_HERE";  // Replace with your Sheet ID
-const SHEET_NAME = "Devotionals";       // Sheet/tab name
+const SHEET_ID = "1dC6pjjA_fW_1ZzAQjGX04WSa1c7aryG8leR4U1aB76o"; // replace with your Sheet ID
+const SHEET_NAME = "Devotionals"; // exact tab name
 const SHEET_URL = `https://opensheet.vercel.app/${SHEET_ID}/${SHEET_NAME}`;
-const ANALYTICS_URL = "YOUR_ANALYTICS_WEB_APP_URL"; // Replace with deployed Apps Script URL
+const ANALYTICS_URL = "AKfycbw3oKElpBiZ3fMkY9EJL3wd6LpmsOO1bCvTUDCRbg8EZIm0loXs_oX5uaLj4Cz1sXUo"; // replace with your Apps Script URL
 
 // === ELEMENTS ===
 const dateEl = document.getElementById("date");
@@ -22,7 +22,7 @@ let currentDate = new Date();
 
 // === UTILITIES ===
 function formatDateYYYYMMDD(date) {
-  return date.getFullYear() + "-" + 
+  return date.getFullYear() + "-" +
          String(date.getMonth() + 1).padStart(2, "0") + "-" +
          String(date.getDate()).padStart(2, "0");
 }
@@ -38,12 +38,10 @@ function getSimpleDevice() {
   return "Other";
 }
 
-// Normalize sheet date (handles YYYY-MM-DD or MM/DD/YYYY)
+// Normalize sheet date (YYYY-MM-DD or MM/DD/YYYY)
 function normalizeSheetDate(sheetDate) {
   if (!sheetDate) return null;
-  // ISO format
   if (/^\d{4}-\d{2}-\d{2}/.test(sheetDate)) return sheetDate.split("T")[0];
-  // MM/DD/YYYY
   if (/^\d{1,2}\/\d{1,2}\/\d{4}/.test(sheetDate)) {
     const [m, d, y] = sheetDate.split("/").map(Number);
     return `${y}-${String(m).padStart(2,"0")}-${String(d).padStart(2,"0")}`;
@@ -196,11 +194,8 @@ nextBtn.addEventListener("click", () => {
 jumpBtn.addEventListener("click", () => {
   const selectedDate = jumpDateInput.value;
   if (!selectedDate) return;
-
   const [year, month, day] = selectedDate.split("-").map(Number);
   currentDate = new Date(year, month - 1, day);
-  if (isNaN(currentDate)) return;
-
   loadDevotional(currentDate);
 });
 jumpDateInput.addEventListener("keydown", (e) => {
