@@ -41,11 +41,24 @@ function getSimpleDevice() {
 // Normalize sheet date (YYYY-MM-DD or MM/DD/YYYY)
 function normalizeSheetDate(sheetDate) {
   if (!sheetDate) return null;
+
+  // Case 1: YYYY-MM-DD or with time
   if (/^\d{4}-\d{2}-\d{2}/.test(sheetDate)) return sheetDate.split("T")[0];
+
+  // Case 2: MM/DD/YYYY
   if (/^\d{1,2}\/\d{1,2}\/\d{4}/.test(sheetDate)) {
     const [m, d, y] = sheetDate.split("/").map(Number);
     return `${y}-${String(m).padStart(2,"0")}-${String(d).padStart(2,"0")}`;
   }
+
+  // Case 3: Excel timestamp (number)
+  const num = Number(sheetDate);
+  if (!isNaN(num)) {
+    const date = new Date(Math.round((num - 25569)*86400*1000));
+    return formatDateYYYYMMDD(date);
+  }
+
+  // fallback
   return null;
 }
 
