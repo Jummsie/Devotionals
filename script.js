@@ -1,6 +1,8 @@
 // === CONFIGURATION ===
-const { SHEET_ID, SHEET_NAME, ANALYTICS_URL } = window.APP_CONFIG;
+const SHEET_ID = "YOUR_SHEET_ID_HERE";  // Replace with your Sheet ID
+const SHEET_NAME = "Devotionals";       // Sheet/tab name
 const SHEET_URL = `https://opensheet.vercel.app/${SHEET_ID}/${SHEET_NAME}`;
+const ANALYTICS_URL = "YOUR_ANALYTICS_WEB_APP_URL"; // Replace with deployed Apps Script URL
 
 // === ELEMENTS ===
 const dateEl = document.getElementById("date");
@@ -18,11 +20,11 @@ const jumpBtn = document.getElementById("jumpBtn");
 
 let currentDate = new Date();
 
+// === UTILITIES ===
 function formatDate(date) {
   return date.toISOString().split("T")[0];
 }
 
-// --- Simple Device Detection ---
 function getSimpleDevice() {
   const ua = navigator.userAgent;
   if (/Mobi|Android/i.test(ua)) return "Mobile";
@@ -34,7 +36,7 @@ function getSimpleDevice() {
   return "Other";
 }
 
-// --- Analytics ---
+// --- ANALYTICS ---
 function sendAnalytics(actionType) {
   const devotionalDate = formatDate(currentDate);
   const device = getSimpleDevice();
@@ -50,7 +52,7 @@ function sendAnalytics(actionType) {
   }).catch(err => console.warn("Analytics failed:", err));
 }
 
-// --- Load Devotional ---
+// --- LOAD DEVOTIONAL ---
 function loadDevotional(dateObj) {
   const dateISO = formatDate(dateObj);
 
@@ -59,11 +61,12 @@ function loadDevotional(dateObj) {
     .then(rows => {
       if (!Array.isArray(rows)) throw new Error("Invalid sheet data");
 
-      // Normalize dates for comparison
+      // Normalize sheet date to local YYYY-MM-DD for reliable comparison
       const todayData = rows.find(r => {
         if (!r.date) return false;
-        const normalized = new Date(r.date).toISOString().split("T")[0];
-        return normalized === dateISO;
+        const [y, m, d] = r.date.split("-").map(Number);
+        const localDateStr = new Date(y, m - 1, d).toISOString().split("T")[0];
+        return localDateStr === dateISO;
       });
 
       dateEl.textContent = dateObj.toLocaleDateString("en-US", {
@@ -75,7 +78,7 @@ function loadDevotional(dateObj) {
       const progressLabel = document.querySelector(".progress-label");
       const progressFill = document.querySelector(".progress-bar-fill");
 
-      // Reset progress bar
+      // Reset progress
       progressLabel.textContent = "Progress: 0%";
       progressFill.style.width = "0%";
       progressFill.style.backgroundColor = "#2c6cb8";
@@ -137,6 +140,7 @@ function loadDevotional(dateObj) {
         }
       }
 
+      // Build checklist
       standardPlan.forEach((item, index) => {
         const li = document.createElement("li");
         if (item.minutes) {
@@ -178,18 +182,19 @@ nextBtn.addEventListener("click", () => {
   loadDevotional(currentDate);
 });
 
-// --- Date Picker Jump (mobile-safe) ---
+// --- Date Picker Jump (mobile safe) ---
 jumpBtn.addEventListener("click", () => {
-  const selectedDate = jumpDateInput.value; // "YYYY-MM-DD"
+  const selectedDate = jumpDateInput.value;
   if (!selectedDate) return;
 
   const [year, month, day] = selectedDate.split("-").map(Number);
   currentDate = new Date(year, month - 1, day);
   if (isNaN(currentDate)) return;
+
   loadDevotional(currentDate);
 });
 
-// --- Enter key support ---
+// Enter key support for mobile
 jumpDateInput.addEventListener("keydown", (e) => {
   if (e.key === "Enter") jumpBtn.click();
 });
@@ -205,3 +210,4 @@ completeBtn.addEventListener("click", () => {
 
 // --- Initial Load ---
 loadDevotional(currentDate);
+
