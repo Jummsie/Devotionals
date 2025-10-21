@@ -21,8 +21,10 @@ const jumpBtn = document.getElementById("jumpBtn");
 let currentDate = new Date();
 
 // === UTILITIES ===
-function formatDate(date) {
-  return date.toISOString().split("T")[0];
+function formatDateYYYYMMDD(date) {
+  return date.getFullYear() + "-" + 
+         String(date.getMonth() + 1).padStart(2, "0") + "-" +
+         String(date.getDate()).padStart(2, "0");
 }
 
 function getSimpleDevice() {
@@ -38,7 +40,7 @@ function getSimpleDevice() {
 
 // --- ANALYTICS ---
 function sendAnalytics(actionType) {
-  const devotionalDate = formatDate(currentDate);
+  const devotionalDate = formatDateYYYYMMDD(currentDate);
   const device = getSimpleDevice();
 
   fetch(ANALYTICS_URL, {
@@ -54,19 +56,19 @@ function sendAnalytics(actionType) {
 
 // --- LOAD DEVOTIONAL ---
 function loadDevotional(dateObj) {
-  const dateISO = formatDate(dateObj);
+  const dateISO = formatDateYYYYMMDD(dateObj);
 
   fetch(SHEET_URL)
     .then(res => res.json())
     .then(rows => {
       if (!Array.isArray(rows)) throw new Error("Invalid sheet data");
 
-      // Normalize sheet date to local YYYY-MM-DD for reliable comparison
+      // Compare YYYY-MM-DD strings directly
       const todayData = rows.find(r => {
         if (!r.date) return false;
         const [y, m, d] = r.date.split("-").map(Number);
-        const localDateStr = new Date(y, m - 1, d).toISOString().split("T")[0];
-        return localDateStr === dateISO;
+        const sheetDateStr = y + "-" + String(m).padStart(2, "0") + "-" + String(d).padStart(2, "0");
+        return sheetDateStr === dateISO;
       });
 
       dateEl.textContent = dateObj.toLocaleDateString("en-US", {
@@ -78,7 +80,6 @@ function loadDevotional(dateObj) {
       const progressLabel = document.querySelector(".progress-label");
       const progressFill = document.querySelector(".progress-bar-fill");
 
-      // Reset progress
       progressLabel.textContent = "Progress: 0%";
       progressFill.style.width = "0%";
       progressFill.style.backgroundColor = "#2c6cb8";
@@ -172,7 +173,7 @@ function loadDevotional(dateObj) {
     });
 }
 
-// --- Navigation ---
+// --- NAVIGATION ---
 prevBtn.addEventListener("click", () => {
   currentDate.setDate(currentDate.getDate() - 1);
   loadDevotional(currentDate);
@@ -182,7 +183,7 @@ nextBtn.addEventListener("click", () => {
   loadDevotional(currentDate);
 });
 
-// --- Date Picker Jump (mobile safe) ---
+// --- DATE PICKER JUMP ---
 jumpBtn.addEventListener("click", () => {
   const selectedDate = jumpDateInput.value;
   if (!selectedDate) return;
@@ -199,15 +200,14 @@ jumpDateInput.addEventListener("keydown", (e) => {
   if (e.key === "Enter") jumpBtn.click();
 });
 
-// --- Complete Button ---
+// --- COMPLETE BUTTON ---
 completeBtn.addEventListener("click", () => {
-  const dateISO = formatDate(currentDate);
+  const dateISO = formatDateYYYYMMDD(currentDate);
   localStorage.setItem(dateISO, "completed");
   completeBtn.disabled = true;
   statusEl.textContent = "✅ Completed for this day!";
   sendAnalytics("completed");
 });
 
-// --- Initial Load ---
+// --- INITIAL LOAD ---
 loadDevotional(currentDate);
-
