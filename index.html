@@ -8,9 +8,10 @@
 </head>
 <body>
   <div class="container">
-    <h1>
-      <img src="images/images.jpeg" alt="Sun" class="title-icon"> Daily Devotional
-    </h1>
+    <header class="header">
+      <img src="images/images.jpeg" alt="Church Logo" class="logo">
+      <h1 class="app-title">Daily Devotional</h1>
+    </header>
 
     <!-- Date Picker Jump -->
     <div class="jump">
@@ -31,8 +32,16 @@
       <p id="message"></p>
 
       <h3>🕊️ Daily Plan</h3>
-      <ul id="prayers"></ul>
 
+      <div class="progress-container">
+      <div class="progress-label">Progress: 0%</div>
+      <div class="progress-bar-bg">
+        <div class="progress-bar-fill"></div>
+      </div>
+    </div>
+      <ul id="prayers"></ul>
+      <!-- Progress Bar -->
+    
       <button id="completeBtn">✅ Mark as Complete</button>
       <p id="status"></p>
     </div>

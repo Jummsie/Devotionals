@@ -69,10 +69,18 @@ function loadDevotional(dateObj) {
 
       prayersEl.innerHTML = "";
 
+      const progressLabel = document.querySelector(".progress-label");
+      const progressFill = document.querySelector(".progress-bar-fill");
+
+      // Reset progress bar
+      progressLabel.textContent = "Progress: 0%";
+      progressFill.style.width = "0%";
+
       if (!todayData) {
         titleEl.textContent = "No devotional found for this date.";
         scripturesEl.textContent = "";
         messageEl.textContent = "";
+        prayersEl.innerHTML = "";
         completeBtn.disabled = true;
         statusEl.textContent = "";
         return;
@@ -82,7 +90,7 @@ function loadDevotional(dateObj) {
       scripturesEl.textContent = "📖 " + todayData.scriptures;
       messageEl.textContent = todayData.message;
 
-      // Standard daily plan checklist
+      // Standard daily plan
       const standardPlan = [
         { activity: "Please tick after you complete this daily plan", minutes: "" },
         { activity: "Praise", minutes: 5 },
@@ -102,15 +110,44 @@ function loadDevotional(dateObj) {
       header.style.fontWeight = "bold";
       prayersEl.appendChild(header);
 
-      standardPlan.forEach(item => {
+      // Load saved progress from localStorage
+      const savedProgress = JSON.parse(localStorage.getItem(`${dateISO}-plan`) || "{}");
+
+      // Helper function: update progress
+      function updateProgress() {
+        const total = standardPlan.filter(i => i.minutes).length;
+        const completed = Object.values(savedProgress).filter(Boolean).length;
+        const percent = Math.round((completed / total) * 100);
+        progressLabel.textContent = `Progress: ${percent}%`;
+        progressFill.style.width = `${percent}%`;
+      }
+
+      // Build checklist
+      standardPlan.forEach((item, index) => {
         const li = document.createElement("li");
-        if(item.minutes){
-          li.innerHTML = `<input type="checkbox" /> ${item.activity} – ${item.minutes} mins`;
+
+        if (item.minutes) {
+          const checkbox = document.createElement("input");
+          checkbox.type = "checkbox";
+          checkbox.checked = savedProgress[index] || false;
+
+          checkbox.addEventListener("change", () => {
+            savedProgress[index] = checkbox.checked;
+            localStorage.setItem(`${dateISO}-plan`, JSON.stringify(savedProgress));
+            updateProgress();
+          });
+
+          li.appendChild(checkbox);
+          li.appendChild(document.createTextNode(` ${item.activity} – ${item.minutes} mins`));
         } else {
           li.textContent = item.activity;
         }
+
         prayersEl.appendChild(li);
       });
+
+      // Initialize progress bar
+      updateProgress();
 
       // Completion status
       if (localStorage.getItem(dateISO) === "completed") {
@@ -129,6 +166,7 @@ function loadDevotional(dateObj) {
       titleEl.textContent = "Could not load daily devotional data.";
     });
 }
+
 
 // === NAVIGATION ===
 prevBtn.addEventListener("click", () => {
